@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Cimko Labs — Next-Gen Technology Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+
+:root{
+  --ink:#04080F;
+  --ink2:#0B1220;
+  --blue:#3B5BFF;
+  --blue2:#5B78FF;
+  --teal:#00D4AA;
+  --purple:#8B5CF6;
+  --red:#FF4444;
+  --amber:#F59E0B;
+  --white:#FFFFFF;
+  --muted:#6B7A9A;
+  --surface:#0D1528;
+  --surface2:#111D35;
+  --border:#1A2848;
+}
+
+html{scroll-behavior:smooth;}
+
+body{
+  background:var(--ink);
+  color:var(--white);
+  font-family:'DM Sans',sans-serif;
+  font-size:16px;
+  line-height:1.6;
+  overflow-x:hidden;
+  cursor:none;
+}
+
+/* CUSTOM CURSOR */
+#cursor{
+  width:12px;height:12px;
+  background:var(--blue);
+  border-radius:50%;
+  position:fixed;top:0;left:0;
+  pointer-events:none;
+  z-index:9999;
+  transition:transform 0.15s ease, background 0.2s ease;
+  mix-blend-mode:screen;
+}
+#cursor-ring{
+  width:36px;height:36px;
+  border:1px solid rgba(59,91,255,0.4);
+  border-radius:50%;
+  position:fixed;top:0;left:0;
+  pointer-events:none;
+  z-index:9998;
+  transition:transform 0.4s cubic-bezier(0.23,1,0.32,1), width 0.3s, height 0.3s, border-color 0.3s;
+}
+
+/* NOISE OVERLAY */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  opacity:0.025;
+  pointer-events:none;
+  z-index:1;
+}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;
+  z-index:100;
+  padding:0 60px;
+  height:72px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid transparent;
+  transition:background 0.4s, border-color 0.4s, backdrop-filter 0.4s;
+}
+nav.scrolled{
+  background:rgba(4,8,15,0.85);
+  border-color:var(--border);
+  backdrop-filter:blur(20px);
+}
+.nav-logo{
+  display:flex;align-items:center;gap:12px;
+  text-decoration:none;
+}
+.logo-mark{
+  width:38px;height:38px;
+  border:1px solid var(--blue);
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+  overflow:hidden;
+}
+.logo-mark::before{
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(59,91,255,0.2),transparent);
+}
+.logo-mark span{
+  font-family:'Space Mono',monospace;
+  font-size:11px;font-weight:700;
+  color:var(--blue);
+  letter-spacing:1px;
+  position:relative;z-index:1;
+}
+.logo-text{
+  display:flex;flex-direction:column;line-height:1;
+}
+.logo-text strong{
+  font-family:'Syne',sans-serif;
+  font-size:17px;font-weight:800;
+  color:var(--white);
+  letter-spacing:2px;
+}
+.logo-text em{
+  font-style:normal;
+  font-family:'Space Mono',monospace;
+  font-size:9px;
+  color:var(--blue);
+  letter-spacing:4px;
+}
+.nav-links{
+  display:flex;align-items:center;gap:40px;
+  list-style:none;
+}
+.nav-links a{
+  text-decoration:none;
+  font-size:13px;font-weight:400;
+  color:var(--muted);
+  letter-spacing:0.5px;
+  transition:color 0.2s;
+}
+.nav-links a:hover{color:var(--white);}
+.nav-cta{
+  background:var(--blue);
+  color:var(--white)!important;
+  padding:10px 22px;
+  border-radius:6px;
+  font-weight:500!important;
+  letter-spacing:0.5px;
+  transition:background 0.2s, transform 0.2s!important;
+}
+.nav-cta:hover{background:var(--blue2)!important;transform:translateY(-1px);}
+
+/* HERO */
+#hero{
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  align-items:center;
+  padding:120px 60px 80px;
+  position:relative;
+  overflow:hidden;
+}
+
+/* animated grid bg */
+#hero::before{
+  content:'';
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(59,91,255,0.06) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(59,91,255,0.06) 1px,transparent 1px);
+  background-size:60px 60px;
+  animation:gridShift 20s linear infinite;
+}
+@keyframes gridShift{
+  0%{background-position:0 0;}
+  100%{background-position:60px 60px;}
+}
+
+/* glow orbs */
+.orb{
+  position:absolute;border-radius:50%;
+  pointer-events:none;
+  animation:pulse 8s ease-in-out infinite alternate;
+}
+.orb1{
+  width:500px;height:500px;
+  background:radial-gradient(circle,rgba(59,91,255,0.12) 0%,transparent 70%);
+  top:-100px;right:-100px;
+  animation-delay:0s;
+}
+.orb2{
+  width:400px;height:400px;
+  background:radial-gradient(circle,rgba(0,212,170,0.08) 0%,transparent 70%);
+  bottom:0;left:200px;
+  animation-delay:3s;
+}
+.orb3{
+  width:300px;height:300px;
+  background:radial-gradient(circle,rgba(139,92,246,0.08) 0%,transparent 70%);
+  top:200px;right:300px;
+  animation-delay:5s;
+}
+@keyframes pulse{
+  0%{transform:scale(1);}
+  100%{transform:scale(1.15);}
+}
+
+.hero-left{position:relative;z-index:2;}
+
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(59,91,255,0.1);
+  border:1px solid rgba(59,91,255,0.25);
+  border-radius:100px;
+  padding:6px 16px;
+  margin-bottom:32px;
+  font-size:11px;
+  font-family:'Space Mono',monospace;
+  color:var(--blue2);
+  letter-spacing:2px;
+  animation:fadeUp 0.8s ease both;
+}
+.badge-dot{
+  width:6px;height:6px;
+  background:var(--teal);
+  border-radius:50%;
+  animation:blink 2s ease-in-out infinite;
+}
+@keyframes blink{
+  0%,100%{opacity:1;}50%{opacity:0.3;}
+}
+
+h1{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(42px,5.5vw,76px);
+  font-weight:800;
+  line-height:1.0;
+  letter-spacing:-1px;
+  animation:fadeUp 0.8s 0.15s ease both;
+}
+h1 .line1{display:block;color:var(--white);}
+h1 .line2{
+  display:block;
+  background:linear-gradient(90deg,var(--blue),var(--teal));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+h1 .line3{display:block;color:var(--white);}
+
+.hero-sub{
+  margin-top:28px;
+  font-size:16px;
+  color:var(--muted);
+  max-width:440px;
+  line-height:1.7;
+  font-weight:300;
+  animation:fadeUp 0.8s 0.3s ease both;
+}
+
+.hero-actions{
+  display:flex;align-items:center;gap:20px;
+  margin-top:40px;
+  animation:fadeUp 0.8s 0.45s ease both;
+}
+.btn-primary{
+  display:inline-flex;align-items:center;gap:10px;
+  background:var(--blue);
+  color:var(--white);
+  text-decoration:none;
+  padding:14px 30px;
+  border-radius:8px;
+  font-size:14px;font-weight:500;
+  letter-spacing:0.3px;
+  transition:background 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+.btn-primary:hover{
+  background:var(--blue2);
+  transform:translateY(-2px);
+  box-shadow:0 12px 40px rgba(59,91,255,0.35);
+}
+.btn-primary svg{transition:transform 0.2s;}
+.btn-primary:hover svg{transform:translateX(3px);}
+.btn-ghost{
+  display:inline-flex;align-items:center;gap:8px;
+  color:var(--muted);
+  text-decoration:none;
+  font-size:14px;
+  transition:color 0.2s;
+}
+.btn-ghost:hover{color:var(--white);}
+
+/* HERO RIGHT — robot + floating cards */
+.hero-right{
+  position:relative;z-index:2;
+  display:flex;justify-content:center;align-items:center;
+  height:600px;
+  animation:fadeUp 0.8s 0.2s ease both;
+}
+
+.robot-wrap{
+  position:relative;
+  width:280px;height:480px;
+}
+
+/* robot SVG inline */
+.robot-svg{
+  width:280px;
+  filter:drop-shadow(0 0 40px rgba(59,91,255,0.25));
+  animation:robotFloat 6s ease-in-out infinite;
+}
+@keyframes robotFloat{
+  0%,100%{transform:translateY(0px);}
+  50%{transform:translateY(-16px);}
+}
+
+/* floating service tags */
+.float-tag{
+  position:absolute;
+  background:rgba(13,21,40,0.9);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:10px 16px;
+  font-size:12px;
+  font-family:'Space Mono',monospace;
+  color:var(--white);
+  backdrop-filter:blur(10px);
+  white-space:nowrap;
+  animation:tagFloat 5s ease-in-out infinite;
+}
+.float-tag::before{
+  content:'';
+  display:inline-block;
+  width:6px;height:6px;
+  border-radius:50%;
+  margin-right:8px;
+  vertical-align:middle;
+}
+.ft1{top:30px;left:-80px;animation-delay:0s;}
+.ft1::before{background:var(--blue);}
+.ft2{top:140px;right:-90px;animation-delay:1.5s;}
+.ft2::before{background:var(--teal);}
+.ft3{bottom:180px;left:-70px;animation-delay:2.5s;}
+.ft3::before{background:var(--purple);}
+.ft4{bottom:80px;right:-60px;animation-delay:1s;}
+.ft4::before{background:var(--amber);}
+@keyframes tagFloat{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-8px);}
+}
+
+/* scroll hint */
+.scroll-hint{
+  position:absolute;bottom:40px;left:60px;
+  display:flex;align-items:center;gap:12px;
+  color:var(--muted);font-size:12px;
+  font-family:'Space Mono',monospace;
+  letter-spacing:1px;
+  z-index:2;
+  animation:fadeUp 1s 0.8s ease both;
+}
+.scroll-line{
+  width:40px;height:1px;
+  background:var(--border);
+  position:relative;overflow:hidden;
+}
+.scroll-line::after{
+  content:'';
+  position:absolute;top:0;left:-100%;
+  width:100%;height:100%;
+  background:var(--blue);
+  animation:scanLine 2s ease-in-out infinite;
+}
+@keyframes scanLine{
+  0%{left:-100%;}100%{left:100%;}
+}
+
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(24px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+/* SECTION COMMONS */
+section{
+  padding:120px 60px;
+  position:relative;
+}
+.section-label{
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:20px;
+}
+.section-label span{
+  font-family:'Space Mono',monospace;
+  font-size:10px;
+  color:var(--blue);
+  letter-spacing:4px;
+  text-transform:uppercase;
+}
+.section-label::after{
+  content:'';
+  flex:1;
+  height:1px;
+  background:var(--border);
+}
+.section-title{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(28px,4vw,52px);
+  font-weight:800;
+  line-height:1.1;
+  letter-spacing:-0.5px;
+}
+.section-title em{
+  font-style:normal;
+  background:linear-gradient(90deg,var(--blue),var(--teal));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+/* SERVICES SECTION */
+#services{
+  background:var(--ink);
+}
+.services-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1px;
+  background:var(--border);
+  border:1px solid var(--border);
+  border-radius:16px;
+  overflow:hidden;
+  margin-top:60px;
+}
+.service-card{
+  background:var(--ink);
+  padding:40px 36px;
+  position:relative;
+  overflow:hidden;
+  transition:background 0.3s;
+  cursor:none;
+}
+.service-card::before{
+  content:'';
+  position:absolute;top:0;left:0;right:0;
+  height:2px;
+  background:var(--card-accent,var(--blue));
+  transform:scaleX(0);
+  transform-origin:left;
+  transition:transform 0.4s cubic-bezier(0.23,1,0.32,1);
+}
+.service-card:hover::before{transform:scaleX(1);}
+.service-card:hover{background:var(--surface);}
+
+.card-icon{
+  width:48px;height:48px;
+  border-radius:12px;
+  background:rgba(59,91,255,0.08);
+  border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:24px;
+  transition:border-color 0.3s, background 0.3s;
+}
+.service-card:hover .card-icon{
+  background:rgba(59,91,255,0.15);
+  border-color:var(--card-accent,var(--blue));
+}
+.card-icon svg{width:22px;height:22px;}
+
+.card-num{
+  position:absolute;top:32px;right:32px;
+  font-family:'Space Mono',monospace;
+  font-size:11px;
+  color:var(--border);
+  transition:color 0.3s;
+}
+.service-card:hover .card-num{color:var(--card-accent,var(--blue));}
+
+.card-title{
+  font-family:'Syne',sans-serif;
+  font-size:20px;font-weight:700;
+  margin-bottom:12px;
+  color:var(--white);
+}
+.card-desc{
+  font-size:14px;
+  color:var(--muted);
+  line-height:1.65;
+  font-weight:300;
+}
+.card-tags{
+  display:flex;flex-wrap:wrap;gap:6px;
+  margin-top:20px;
+}
+.tag{
+  font-size:10px;
+  font-family:'Space Mono',monospace;
+  color:var(--muted);
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:4px 8px;
+  letter-spacing:0.5px;
+}
+
+/* WHY US */
+#why{
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+}
+.why-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:80px;
+  align-items:center;
+  margin-top:60px;
+}
+.why-stats{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:2px;
+  background:var(--border);
+  border:1px solid var(--border);
+  border-radius:16px;
+  overflow:hidden;
+}
+.stat-box{
+  background:var(--ink2);
+  padding:36px 32px;
+}
+.stat-num{
+  font-family:'Syne',sans-serif;
+  font-size:48px;font-weight:800;
+  line-height:1;
+  margin-bottom:8px;
+}
+.stat-label{
+  font-size:13px;color:var(--muted);font-weight:300;
+}
+.why-points{display:flex;flex-direction:column;gap:32px;}
+.why-point{
+  display:flex;gap:20px;align-items:flex-start;
+}
+.point-icon{
+  width:40px;height:40px;flex-shrink:0;
+  border-radius:10px;
+  background:rgba(59,91,255,0.08);
+  border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  margin-top:2px;
+}
+.point-icon svg{width:18px;height:18px;}
+.point-title{
+  font-family:'Syne',sans-serif;
+  font-size:16px;font-weight:700;
+  margin-bottom:6px;
+}
+.point-desc{font-size:14px;color:var(--muted);font-weight:300;line-height:1.6;}
+
+/* ABOUT */
+#about{
+  background:var(--ink);
+}
+.about-inner{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:100px;
+  align-items:center;
+  margin-top:60px;
+}
+.about-visual{
+  position:relative;
+  height:420px;
+}
+.about-card{
+  position:absolute;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:20px 24px;
+}
+.about-card.ac1{top:0;left:0;right:60px;}
+.about-card.ac2{bottom:0;left:60px;right:0;}
+.ac-label{font-size:11px;font-family:'Space Mono',monospace;color:var(--muted);letter-spacing:2px;margin-bottom:10px;}
+.ac-value{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;}
+.ac-bar{
+  height:4px;border-radius:2px;
+  background:var(--border);
+  margin-top:12px;overflow:hidden;
+}
+.ac-fill{
+  height:100%;border-radius:2px;
+  animation:barFill 2s 0.5s ease both;
+}
+@keyframes barFill{from{width:0;}to{width:var(--w,70%);}}
+.about-text p{
+  font-size:15px;color:var(--muted);
+  line-height:1.8;font-weight:300;
+  margin-bottom:20px;
+}
+.about-text p strong{color:var(--white);font-weight:500;}
+.parent-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(0,212,170,0.08);
+  border:1px solid rgba(0,212,170,0.2);
+  border-radius:6px;
+  padding:10px 16px;
+  font-size:12px;color:var(--teal);
+  font-family:'Space Mono',monospace;
+  margin-top:8px;
+}
+
+/* CONTACT */
+#contact{
+  background:var(--ink2);
+  border-top:1px solid var(--border);
+}
+.contact-inner{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:80px;
+  margin-top:60px;
+}
+.contact-text p{
+  font-size:15px;color:var(--muted);line-height:1.8;font-weight:300;margin-bottom:32px;
+}
+.contact-methods{display:flex;flex-direction:column;gap:16px;}
+.contact-method{
+  display:flex;align-items:center;gap:16px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:16px 20px;
+  text-decoration:none;
+  transition:border-color 0.2s, background 0.2s;
+}
+.contact-method:hover{
+  border-color:var(--blue);
+  background:rgba(59,91,255,0.05);
+}
+.method-icon{
+  width:36px;height:36px;
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.method-label{font-size:11px;font-family:'Space Mono',monospace;color:var(--muted);letter-spacing:1px;display:block;margin-bottom:2px;}
+.method-value{font-size:14px;color:var(--white);font-weight:500;}
+
+.contact-form{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:40px;
+}
+.form-title{
+  font-family:'Syne',sans-serif;
+  font-size:22px;font-weight:700;
+  margin-bottom:28px;
+}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.form-group{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+.form-group label{font-size:12px;font-family:'Space Mono',monospace;color:var(--muted);letter-spacing:1px;}
+.form-group input,
+.form-group textarea,
+.form-group select{
+  background:var(--ink2);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:12px 16px;
+  color:var(--white);
+  font-family:'DM Sans',sans-serif;
+  font-size:14px;
+  outline:none;
+  transition:border-color 0.2s;
+  width:100%;
+  resize:none;
+}
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus{border-color:var(--blue);}
+.form-group select option{background:var(--ink2);}
+.form-group textarea{height:100px;}
+.form-submit{
+  width:100%;
+  background:var(--blue);
+  color:var(--white);
+  border:none;
+  border-radius:8px;
+  padding:14px;
+  font-size:14px;font-weight:500;
+  font-family:'DM Sans',sans-serif;
+  cursor:pointer;
+  transition:background 0.2s, transform 0.2s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-top:8px;
+}
+.form-submit:hover{background:var(--blue2);transform:translateY(-1px);}
+.form-success{
+  display:none;
+  text-align:center;
+  padding:40px;
+}
+.form-success.show{display:block;}
+.form-success svg{margin-bottom:16px;}
+.form-success h3{font-family:'Syne',sans-serif;font-size:22px;margin-bottom:8px;}
+.form-success p{color:var(--muted);font-size:14px;}
+
+/* FOOTER */
+footer{
+  background:var(--ink);
+  border-top:1px solid var(--border);
+  padding:40px 60px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.footer-copy{font-size:13px;color:var(--muted);}
+.footer-copy span{color:var(--blue);}
+.footer-links{display:flex;gap:32px;}
+.footer-links a{
+  font-size:13px;color:var(--muted);
+  text-decoration:none;
+  font-family:'Space Mono',monospace;
+  font-size:11px;
+  letter-spacing:1px;
+  transition:color 0.2s;
+}
+.footer-links a:hover{color:var(--white);}
+
+/* SCROLL REVEAL */
+.reveal{
+  opacity:0;
+  transform:translateY(32px);
+  transition:opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.visible{opacity:1;transform:none;}
+.reveal-delay-1{transition-delay:0.1s;}
+.reveal-delay-2{transition-delay:0.2s;}
+.reveal-delay-3{transition-delay:0.3s;}
+.reveal-delay-4{transition-delay:0.4s;}
+
+/* MOBILE */
+@media(max-width:900px){
+  nav{padding:0 24px;}
+  .nav-links{display:none;}
+  #hero{grid-template-columns:1fr;padding:100px 24px 60px;}
+  .hero-right{display:none;}
+  section{padding:80px 24px;}
+  .services-grid{grid-template-columns:1fr;}
+  .why-grid,.about-inner,.contact-inner{grid-template-columns:1fr;gap:40px;}
+  .form-row{grid-template-columns:1fr;}
+  footer{flex-direction:column;gap:20px;text-align:center;padding:32px 24px;}
+}
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">
+    <div class="logo-mark"><span>CL</span></div>
+    <div class="logo-text">
+      <strong>CIMKO</strong>
+      <em>LABS</em>
+    </div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#why">Why Us</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact" class="nav-cta">Get in Touch</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+
+  <div class="hero-left">
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      LAGOS · NIGERIA · GLOBAL REACH
+    </div>
+    <h1>
+      <span class="line1">Technology</span>
+      <span class="line2">Without</span>
+      <span class="line3">Limits.</span>
+    </h1>
+    <p class="hero-sub">Cimko Labs is a next-generation technology studio building world-class software, AI systems, hardware solutions, and digital experiences — from Lagos to the world.</p>
+    <div class="hero-actions">
+      <a href="#contact" class="btn-primary">
+        Start a Project
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+      <a href="#services" class="btn-ghost">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Our Services
+      </a>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="robot-wrap">
+      <!-- floating tags -->
+      <div class="float-tag ft1">Web &amp; App Dev</div>
+      <div class="float-tag ft2">AI &amp; Machine Learning</div>
+      <div class="float-tag ft3">Cyber Security</div>
+      <div class="float-tag ft4">Embedded Systems</div>
+
+      <!-- Robot SVG -->
+      <svg class="robot-svg" viewBox="0 0 280 480" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- glow base -->
+        <ellipse cx="140" cy="430" rx="80" ry="16" fill="#3B5BFF" opacity="0.18"/>
+        <!-- orbit ring -->
+        <ellipse cx="140" cy="240" rx="130" ry="34" fill="none" stroke="#3B5BFF" stroke-width="0.8" opacity="0.2" stroke-dasharray="4,4"/>
+        <!-- orbit ring 2 -->
+        <ellipse cx="140" cy="240" rx="110" ry="26" fill="none" stroke="#00D4AA" stroke-width="0.6" opacity="0.15" stroke-dasharray="3,5"/>
+
+        <!-- BODY -->
+        <rect x="72" y="260" width="136" height="120" rx="18" fill="#0D1835" stroke="#1E3060" stroke-width="1.2"/>
+        <!-- chest panel -->
+        <rect x="90" y="276" width="100" height="60" rx="10" fill="#08101E" stroke="#162240" stroke-width="0.8"/>
+        <rect x="90" y="276" width="100" height="2" rx="1" fill="#3B5BFF" opacity="0.9"/>
+        <!-- indicators -->
+        <circle cx="110" cy="295" r="5" fill="#3B5BFF" opacity="0.9"/>
+        <circle cx="140" cy="295" r="5" fill="#00D4AA" opacity="0.9"/>
+        <circle cx="170" cy="295" r="5" fill="#8B5CF6" opacity="0.9"/>
+        <!-- progress bars -->
+        <rect x="98" y="312" width="84" height="7" rx="3.5" fill="#0D1835"/>
+        <rect x="98" y="312" width="55" height="7" rx="3.5" fill="#3B5BFF" opacity="0.7"/>
+        <rect x="98" y="324" width="84" height="7" rx="3.5" fill="#0D1835"/>
+        <rect x="98" y="324" width="38" height="7" rx="3.5" fill="#00D4AA" opacity="0.5"/>
+
+        <!-- NECK -->
+        <rect x="122" y="244" width="36" height="18" rx="6" fill="#091020" stroke="#162240" stroke-width="0.8"/>
+        <line x1="130" y1="248" x2="130" y2="260" stroke="#3B5BFF" stroke-width="0.7" opacity="0.5"/>
+        <line x1="140" y1="248" x2="140" y2="260" stroke="#3B5BFF" stroke-width="0.7" opacity="0.5"/>
+        <line x1="150" y1="248" x2="150" y2="260" stroke="#3B5BFF" stroke-width="0.7" opacity="0.5"/>
+
+        <!-- HEAD -->
+        <rect x="64" y="130" width="152" height="116" rx="22" fill="#0D1835" stroke="#1E3060" stroke-width="1.2"/>
+        <rect x="64" y="130" width="152" height="4" rx="2" fill="#3B5BFF" opacity="0.7"/>
+
+        <!-- FACE -->
+        <rect x="80" y="146" width="120" height="84" rx="14" fill="#060E1C" stroke="#121E3A" stroke-width="0.8"/>
+
+        <!-- LEFT EYE -->
+        <rect x="88" y="158" width="46" height="24" rx="12" fill="#060C18" stroke="#3B5BFF" stroke-width="1"/>
+        <rect x="91" y="161" width="40" height="18" rx="9" fill="#0F1E4A"/>
+        <ellipse cx="111" cy="170" rx="10" ry="7" fill="#3B5BFF" opacity="0.95"/>
+        <ellipse cx="111" cy="170" rx="5" ry="3.5" fill="#7B9EFF"/>
+        <circle cx="116" cy="166" r="2" fill="white" opacity="0.6"/>
+
+        <!-- RIGHT EYE -->
+        <rect x="146" y="158" width="46" height="24" rx="12" fill="#060C18" stroke="#3B5BFF" stroke-width="1"/>
+        <rect x="149" y="161" width="40" height="18" rx="9" fill="#0F1E4A"/>
+        <ellipse cx="169" cy="170" rx="10" ry="7" fill="#3B5BFF" opacity="0.95"/>
+        <ellipse cx="169" cy="170" rx="5" ry="3.5" fill="#7B9EFF"/>
+        <circle cx="174" cy="166" r="2" fill="white" opacity="0.6"/>
+
+        <!-- scan line -->
+        <line x1="88" y1="188" x2="192" y2="188" stroke="#3B5BFF" stroke-width="0.5" opacity="0.3"/>
+
+        <!-- MOUTH -->
+        <rect x="96" y="196" width="88" height="20" rx="6" fill="#060C18" stroke="#121E3A" stroke-width="0.6"/>
+        <rect x="100" y="200" width="12" height="8" rx="3" fill="#00D4AA" opacity="0.9"/>
+        <rect x="116" y="200" width="12" height="8" rx="3" fill="#00D4AA" opacity="0.6"/>
+        <rect x="132" y="200" width="12" height="8" rx="3" fill="#00D4AA" opacity="0.35"/>
+        <rect x="148" y="200" width="12" height="8" rx="3" fill="#3B5BFF" opacity="0.7"/>
+        <rect x="164" y="200" width="12" height="8" rx="3" fill="#3B5BFF" opacity="0.4"/>
+
+        <!-- EARS -->
+        <rect x="48" y="152" width="18" height="36" rx="7" fill="#091020" stroke="#162240" stroke-width="0.8"/>
+        <circle cx="57" cy="170" r="5.5" fill="#3B5BFF" opacity="0.5"/>
+        <rect x="214" y="152" width="18" height="36" rx="7" fill="#091020" stroke="#162240" stroke-width="0.8"/>
+        <circle cx="223" cy="170" r="5.5" fill="#00D4AA" opacity="0.5"/>
+
+        <!-- ANTENNA -->
+        <line x1="140" y1="108" x2="140" y2="130" stroke="#3B5BFF" stroke-width="1.5"/>
+        <circle cx="140" cy="102" r="8" fill="#091020" stroke="#3B5BFF" stroke-width="1.2"/>
+        <circle cx="140" cy="102" r="4" fill="#3B5BFF" opacity="0.9"/>
+        <circle cx="140" cy="102" r="1.5" fill="white" opacity="0.8"/>
+
+        <!-- LEFT ARM -->
+        <rect x="22" y="264" width="44" height="90" rx="14" fill="#0B1428" stroke="#162240" stroke-width="0.8"/>
+        <rect x="30" y="278" width="28" height="44" rx="8" fill="#060E1C" stroke="#0F1E3A" stroke-width="0.6"/>
+        <line x1="44" y1="282" x2="44" y2="318" stroke="#3B5BFF" stroke-width="0.6" opacity="0.6"/>
+        <!-- left hand -->
+        <rect x="24" y="352" width="40" height="22" rx="11" fill="#091020" stroke="#162240" stroke-width="0.8"/>
+        <line x1="34" y1="355" x2="34" y2="371" stroke="#3B5BFF" stroke-width="0.8" opacity="0.5"/>
+        <line x1="44" y1="355" x2="44" y2="371" stroke="#3B5BFF" stroke-width="0.8" opacity="0.5"/>
+        <line x1="54" y1="355" x2="54" y2="371" stroke="#3B5BFF" stroke-width="0.8" opacity="0.5"/>
+
+        <!-- RIGHT ARM -->
+        <rect x="214" y="264" width="44" height="90" rx="14" fill="#0B1428" stroke="#162240" stroke-width="0.8"/>
+        <rect x="222" y="278" width="28" height="44" rx="8" fill="#060E1C" stroke="#0F1E3A" stroke-width="0.6"/>
+        <line x1="236" y1="282" x2="236" y2="318" stroke="#00D4AA" stroke-width="0.6" opacity="0.6"/>
+        <!-- right hand -->
+        <rect x="216" y="352" width="40" height="22" rx="11" fill="#091020" stroke="#162240" stroke-width="0.8"/>
+        <line x1="226" y1="355" x2="226" y2="371" stroke="#00D4AA" stroke-width="0.8" opacity="0.5"/>
+        <line x1="236" y1="355" x2="236" y2="371" stroke="#00D4AA" stroke-width="0.8" opacity="0.5"/>
+        <line x1="246" y1="355" x2="246" y2="371" stroke="#00D4AA" stroke-width="0.8" opacity="0.5"/>
+
+        <!-- PELVIS -->
+        <rect x="90" y="378" width="100" height="28" rx="10" fill="#091020" stroke="#162240" stroke-width="0.8"/>
+        <rect x="106" y="384" width="68" height="10" rx="5" fill="#060E1C"/>
+        <rect x="106" y="384" width="36" height="10" rx="5" fill="#3B5BFF" opacity="0.5"/>
+
+        <!-- LEGS -->
+        <rect x="92" y="404" width="40" height="60" rx="12" fill="#0B1428" stroke="#162240" stroke-width="0.8"/>
+        <rect x="148" y="404" width="40" height="60" rx="12" fill="#0B1428" stroke="#162240" stroke-width="0.8"/>
+
+        <!-- FEET -->
+        <rect x="86" y="458" width="52" height="18" rx="9" fill="#091020" stroke="#162240" stroke-width="0.8"/>
+        <rect x="142" y="458" width="52" height="18" rx="9" fill="#091020" stroke="#162240" stroke-width="0.8"/>
+
+        <!-- floating data dots -->
+        <circle cx="28" cy="190" r="3" fill="#3B5BFF" opacity="0.8"/>
+        <circle cx="14" cy="220" r="1.5" fill="#00D4AA" opacity="0.6"/>
+        <circle cx="262" cy="175" r="3" fill="#8B5CF6" opacity="0.7"/>
+        <circle cx="268" cy="210" r="1.5" fill="#3B5BFF" opacity="0.5"/>
+        <line x1="28" y1="190" x2="48" y2="190" stroke="#3B5BFF" stroke-width="0.6" opacity="0.3" stroke-dasharray="3,3"/>
+        <line x1="262" y1="175" x2="216" y2="165" stroke="#8B5CF6" stroke-width="0.6" opacity="0.3" stroke-dasharray="3,3"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    SCROLL TO EXPLORE
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="section-label reveal">
+    <span>What We Do</span>
+  </div>
+  <h2 class="section-title reveal reveal-delay-1">
+    Every service your<br/><em>technology needs.</em>
+  </h2>
+
+  <div class="services-grid">
+
+    <div class="service-card reveal" style="--card-accent:#3B5BFF;">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#3B5BFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      </div>
+      <span class="card-num">01</span>
+      <h3 class="card-title">Web &amp; App Development</h3>
+      <p class="card-desc">Responsive websites, progressive web apps, and full-stack platforms built to perform. From landing pages to complex SaaS products.</p>
+      <div class="card-tags">
+        <span class="tag">React</span><span class="tag">Node.js</span><span class="tag">Flutter</span><span class="tag">Next.js</span>
+      </div>
+    </div>
+
+    <div class="service-card reveal reveal-delay-1" style="--card-accent:#00D4AA;">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#00D4AA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+      </div>
+      <span class="card-num">02</span>
+      <h3 class="card-title">UI / UX Design</h3>
+      <p class="card-desc">User research, wireframing, prototyping and pixel-perfect design systems that feel intuitive, look stunning, and convert.</p>
+      <div class="card-tags">
+        <span class="tag">Figma</span><span class="tag">Prototyping</span><span class="tag">Design Systems</span>
+      </div>
+    </div>
+
+    <div class="service-card reveal reveal-delay-2" style="--card-accent:#8B5CF6;">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6v6l4 2"/><circle cx="18" cy="6" r="3"/></svg>
+      </div>
+      <span class="card-num">03</span>
+      <h3 class="card-title">AI &amp; Machine Learning</h3>
+      <p class="card-desc">Custom AI models, intelligent automation, NLP pipelines, computer vision, and data analytics solutions built for real business impact.</p>
+      <div class="card-tags">
+        <span class="tag">Python</span><span class="tag">TensorFlow</span><span class="tag">LLMs</span><span class="tag">Computer Vision</span>
+      </div>
+    </div>
+
+    <div class="service-card reveal" style="--card-accent:#F59E0B;">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><circle cx="11" cy="11" r="1"/></svg>
+      </div>
+      <span class="card-num">04</span>
+      <h3 class="card-title">CAD Design</h3>
+      <p class="card-desc">Precision 3D modelling, product design, engineering drawings, and prototyping-ready CAD files for mechanical and electronic projects.</p>
+      <div class="card-tags">
+        <span class="tag">SolidWorks</span><span class="tag">AutoCAD</span><span class="tag">Fusion 360</span>
+      </div>
+    </div>
+
+    <div class="service-card reveal reveal-delay-1" style="--card-accent:#FF4444;">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#FF4444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg>
+      </div>
+      <span class="card-num">05</span>
+      <h3 class="card-title">Embedded Systems</h3>
+      <p class="card-desc">IoT devices, microcontroller programming, sensor integration, firmware development, and smart hardware solutions from concept to production.</p>
+      <div class="card-tags">
+        <span class="tag">Arduino</span><span class="tag">Raspberry Pi</span><span class="tag">IoT</span><span class="tag">RTOS</span>
+      </div>
+    </div>
+
+    <div class="service-card reveal reveal-delay-2" style="--card-accent:#00D4AA;">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#00D4AA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <span class="card-num">06</span>
+      <h3 class="card-title">Cyber Security</h3>
+      <p class="card-desc">Penetration testing, security audits, vulnerability assessments, threat modelling, and secure architecture for businesses that can't afford to be breached.</p>
+      <div class="card-tags">
+        <span class="tag">Pen Testing</span><span class="tag">SIEM</span><span class="tag">SOC</span><span class="tag">ISO 27001</span>
+      </div>
+    </div>
+
+    <div class="service-card reveal" style="--card-accent:#8B5CF6;">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      </div>
+      <span class="card-num">07</span>
+      <h3 class="card-title">Game Development</h3>
+      <p class="card-desc">2D and 3D games, serious games, gamified applications, and interactive experiences across mobile, web, and desktop platforms.</p>
+      <div class="card-tags">
+        <span class="tag">Unity</span><span class="tag">Unreal</span><span class="tag">Godot</span><span class="tag">WebGL</span>
+      </div>
+    </div>
+
+    <div class="service-card reveal reveal-delay-1" style="--card-accent:#3B5BFF;">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#3B5BFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+      </div>
+      <span class="card-num">08</span>
+      <h3 class="card-title">Data &amp; Analytics</h3>
+      <p class="card-desc">Business intelligence dashboards, data pipelines, ETL systems, predictive analytics, and reporting tools that turn raw data into decisions.</p>
+      <div class="card-tags">
+        <span class="tag">Power BI</span><span class="tag">PostgreSQL</span><span class="tag">Pandas</span>
+      </div>
+    </div>
+
+    <div class="service-card reveal reveal-delay-2" style="--card-accent:#F59E0B;">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="9" height="9"/><rect x="13" y="2" width="9" height="9"/><rect x="13" y="13" width="9" height="9"/><rect x="2" y="13" width="9" height="9"/></svg>
+      </div>
+      <span class="card-num">09</span>
+      <h3 class="card-title">Tech Consulting</h3>
+      <p class="card-desc">Architecture reviews, digital transformation strategy, CTO advisory, vendor selection, and technology roadmapping for growing organisations.</p>
+      <div class="card-tags">
+        <span class="tag">Strategy</span><span class="tag">Architecture</span><span class="tag">Advisory</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- WHY US -->
+<section id="why">
+  <div class="section-label reveal">
+    <span>Why Cimko Labs</span>
+  </div>
+  <h2 class="section-title reveal reveal-delay-1">
+    Built different.<br/><em>Delivered different.</em>
+  </h2>
+
+  <div class="why-grid">
+    <div class="why-stats reveal">
+      <div class="stat-box">
+        <div class="stat-num" style="color:#3B5BFF;">9+</div>
+        <div class="stat-label">Service domains under one roof</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" style="color:#00D4AA;">100%</div>
+        <div class="stat-label">Client-focused delivery model</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" style="color:#8B5CF6;">24/7</div>
+        <div class="stat-label">Support and communication</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" style="color:#F59E0B;">∞</div>
+        <div class="stat-label">Scalability built into every solution</div>
+      </div>
+    </div>
+
+    <div class="why-points">
+      <div class="why-point reveal reveal-delay-1">
+        <div class="point-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#3B5BFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <div>
+          <div class="point-title">End-to-end capability</div>
+          <p class="point-desc">From idea to live product — design, build, secure, deploy. No need to juggle multiple agencies.</p>
+        </div>
+      </div>
+      <div class="why-point reveal reveal-delay-2">
+        <div class="point-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#00D4AA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div>
+          <div class="point-title">Experienced, multidisciplinary team</div>
+          <p class="point-desc">Engineers, designers, security experts, and AI specialists working in sync to deliver excellence.</p>
+        </div>
+      </div>
+      <div class="why-point reveal reveal-delay-3">
+        <div class="point-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        </div>
+        <div>
+          <div class="point-title">Lagos-based, globally minded</div>
+          <p class="point-desc">We understand the African tech landscape while building to international standards — a rare combination.</p>
+        </div>
+      </div>
+      <div class="why-point reveal reveal-delay-4">
+        <div class="point-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <div>
+          <div class="point-title">Backed by Cimko Consulting</div>
+          <p class="point-desc">The trust and track record of an established consulting firm — with the speed and energy of a tech studio.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-label reveal">
+    <span>About</span>
+  </div>
+  <h2 class="section-title reveal reveal-delay-1">
+    Rooted in Lagos.<br/><em>Built for the world.</em>
+  </h2>
+
+  <div class="about-inner">
+    <div class="about-visual reveal">
+      <div class="about-card ac1">
+        <div class="ac-label">CURRENT FOCUS</div>
+        <div class="ac-value">Digital Product Development</div>
+        <div class="ac-bar"><div class="ac-fill" style="--w:82%;background:linear-gradient(90deg,#3B5BFF,#00D4AA);"></div></div>
+      </div>
+      <div class="about-card ac2">
+        <div class="ac-label">SERVICE COVERAGE</div>
+        <div class="ac-value">9 Technology Domains</div>
+        <div class="ac-bar"><div class="ac-fill" style="--w:90%;background:linear-gradient(90deg,#8B5CF6,#3B5BFF);"></div></div>
+      </div>
+    </div>
+
+    <div class="about-text reveal reveal-delay-2">
+      <p>Cimko Labs is the technology arm of <strong>Cimko Consulting</strong> — a trusted strategy and business management firm. We were founded to bridge the gap between business expertise and cutting-edge technology delivery.</p>
+      <p>We build software, hardware, AI systems, and digital products for <strong>startups, SMEs, enterprises, and government bodies</strong> across Nigeria and beyond. Every solution is built with intention — not just to function, but to perform, scale, and stand out.</p>
+      <p>Whether you need a mobile app, an IoT device, a secured infrastructure, or a fully AI-powered platform — <strong>we have the team and the capability to deliver it.</strong></p>
+      <div class="parent-badge">
+        ◈ A CIMKO CONSULTING COMPANY
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-label reveal">
+    <span>Get In Touch</span>
+  </div>
+  <h2 class="section-title reveal reveal-delay-1">
+    Let's build something<br/><em>remarkable.</em>
+  </h2>
+
+  <div class="contact-inner">
+    <div>
+      <div class="contact-text reveal reveal-delay-1">
+        <p>Have a project in mind? Want to learn more about what we offer? Reach out via any of the channels below — we respond quickly and take every enquiry seriously.</p>
+      </div>
+      <div class="contact-methods">
+        <a href="https://wa.me/2349064837091" class="contact-method reveal reveal-delay-1" target="_blank">
+          <div class="method-icon" style="background:rgba(37,211,102,0.1);border:1px solid rgba(37,211,102,0.2);">
+            <svg viewBox="0 0 24 24" fill="#25D366" width="18" height="18"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          </div>
+          <div>
+            <span class="method-label">WHATSAPP</span>
+            <span class="method-value">+234 906 483 7091</span>
+          </div>
+        </a>
+
+        <a href="mailto:info@cimkoconsulting.com" class="contact-method reveal reveal-delay-2">
+          <div class="method-icon" style="background:rgba(59,91,255,0.1);border:1px solid rgba(59,91,255,0.2);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#3B5BFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div>
+            <span class="method-label">GENERAL EMAIL</span>
+            <span class="method-value">info@cimkoconsulting.com</span>
+          </div>
+        </a>
+
+        <a href="mailto:fxglobe@cimkoconsulting.com" class="contact-method reveal reveal-delay-3">
+          <div class="method-icon" style="background:rgba(0,212,170,0.08);border:1px solid rgba(0,212,170,0.2);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#00D4AA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div>
+            <span class="method-label">PRIMARY EMAIL</span>
+            <span class="method-value">fxglobe@cimkoconsulting.com</span>
+          </div>
+        </a>
+
+        <div class="contact-method reveal reveal-delay-4" style="cursor:default;">
+          <div class="method-icon" style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div>
+            <span class="method-label">LOCATION</span>
+            <span class="method-value">Lagos, Nigeria</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="contact-form reveal reveal-delay-2">
+      <div id="form-body">
+        <div class="form-title">Send us a message</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Your Name</label>
+            <input type="text" id="f-name" placeholder="John Doe"/>
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="f-email" placeholder="you@company.com"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Service of Interest</label>
+          <select id="f-service">
+            <option value="">Select a service...</option>
+            <option>Web &amp; App Development</option>
+            <option>UI / UX Design</option>
+            <option>AI &amp; Machine Learning</option>
+            <option>CAD Design</option>
+            <option>Embedded Systems</option>
+            <option>Cyber Security</option>
+            <option>Game Development</option>
+            <option>Data &amp; Analytics</option>
+            <option>Tech Consulting</option>
+            <option>Multiple / Not sure yet</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Tell us about your project</label>
+          <textarea id="f-msg" placeholder="Describe what you're looking to build..."></textarea>
+        </div>
+        <button class="form-submit" onclick="submitForm()">
+          Send Message
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+      <div class="form-success" id="form-success">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#00D4AA" stroke-width="1.5" width="48" height="48"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <h3>Message sent!</h3>
+        <p>Thank you for reaching out. The Cimko Labs team will be in touch with you shortly.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-copy">
+    © 2025 <span>Cimko Labs</span>. A Cimko Consulting Company. All rights reserved.
+  </div>
+  <div class="footer-links">
+    <a href="#services">Services</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+    <a href="https://wa.me/2349064837091">WhatsApp</a>
+  </div>
+</footer>
+
+<script>
+// CURSOR
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  cursor.style.transform=`translate(${mx-6}px,${my-6}px)`;
+});
+(function animRing(){
+  rx+=(mx-rx-18)*0.12;
+  ry+=(my-ry-18)*0.12;
+  ring.style.transform=`translate(${rx}px,${ry}px)`;
+  requestAnimationFrame(animRing);
+})();
+document.querySelectorAll('a,button,.service-card').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{
+    cursor.style.transform+=` scale(2)`;
+    ring.style.width='56px';ring.style.height='56px';
+    ring.style.borderColor='rgba(59,91,255,0.6)';
+  });
+  el.addEventListener('mouseleave',()=>{
+    ring.style.width='36px';ring.style.height='36px';
+    ring.style.borderColor='rgba(59,91,255,0.4)';
+  });
+});
+
+// NAV SCROLL
+const nav=document.getElementById('navbar');
+window.addEventListener('scroll',()=>{
+  nav.classList.toggle('scrolled',window.scrollY>40);
+});
+
+// SCROLL REVEAL
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting) e.target.classList.add('visible');
+  });
+},{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// FORM
+function submitForm(){
+  const name=document.getElementById('f-name').value;
+  const email=document.getElementById('f-email').value;
+  const msg=document.getElementById('f-msg').value;
+  if(!name||!email||!msg){
+    alert('Please fill in your name, email, and message.');return;
+  }
+  document.getElementById('form-body').style.display='none';
+  document.getElementById('form-success').classList.add('show');
+}
+</script>
+</body>
+</html>
